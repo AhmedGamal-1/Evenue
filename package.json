@@ -1,0 +1,14 @@
+{
+	"name": "evenue",
+	"version": "1.0.0",
+	"scripts": {
+		"start": "nodemon server.js"
+	},
+	"dependencies": {
+		"ajv": "^8.12.0",
+		"cors": "^2.8.5",
+		"express": "^4.18.2",
+		"mongoose": "^8.1.3",
+		"validator": "^13.11.0"
+	}
+}

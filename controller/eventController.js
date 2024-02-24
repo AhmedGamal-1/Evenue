@@ -1,6 +1,6 @@
 const eventModel = require('../models/eventModel');
 // const ticketModel=require("../models/ticketModel");
-
+//hi
 let getEvents = async (req, res) => {
 	let events = await eventModel.find({});
 	if (events) {

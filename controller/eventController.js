@@ -13,19 +13,25 @@ let getEvents = async (req, res) => {
 	}
 };
 let getEventsByIdRes = async id => {
-	let event = await eventModel.findOne({ _id: id });
-	if (event) {
-		return event;
-	} else {
-		return { message: 'cant get event with this id' };
+	try {
+		let event = await eventModel.findOne({ _id: id });
+		if (event) {
+			return event;
+		} else {
+			return { message: 'cant get event with this id' };
+		}
+	} catch (err) {
+		console.log(err);
 	}
 };
 let getEventsById = async (req, res) => {
-	const ID = req.params.id;
-	let event = await eventModel.findOne({ _id: ID });
-	if (event) {
+	try {
+		const ID = req.params.id;
+		let event = await eventModel.findOne({ _id: ID });
 		res.status(200).json({ data: event });
-	} else {
+	}
+	catch (err) {
+		console.log(err);
 		res.status(404).json({ message: 'fail' });
 	}
 };

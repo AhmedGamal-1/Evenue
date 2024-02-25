@@ -52,12 +52,12 @@ const eventSchema = new mongoose.Schema({
 			date: { type: String, required: true }, //regular
 			times: [
 				{
-					hour: {
-						type: Number,
+					start: {
+						type: String,
 						required: true,
 					}, //price
-					minute: {
-						type: Number,
+					end: {
+						type: String,
 						required: true,
 					}, //total ,res
 					_id: false,

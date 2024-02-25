@@ -3,6 +3,7 @@ const eventController = require('../controller/eventController');
 const ticketController = require('./reservationController');
 const Event = require('../models/eventModel');
 const Review = require('../models/reviewModel');
+const jwt = require('jsonwebtoken');
 let getAllUser = async (req, res) => {
 	let users = await userModel.find({});
 	if (users) {
@@ -72,6 +73,28 @@ let deleteUser = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+let loginUser = async (req, res) => {
+	const { email, password } = req.body;
+  
+	try {
+	  // Check if the user exists with the provided email and password
+	  const user = await userModel.findOne({ email, password });
+  
+	  if (user) {
+		// User exists, generate a JWT token
+		const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '5d' });
+  
+		// Return the token in the response
+		return res.status(200).json({ success: true, token });
+	  } else {
+		// User does not exist or credentials are invalid
+		return res.status(401).json({ success: false, message: 'Invalid credentials' });
+	  }
+	} catch (error) {
+	  console.error('Error checking credentials:', error);
+	  return res.status(500).json({ success: false, message: 'Internal server error' });
+	}
+  };
 
 let submitReview = async (req, res) => {
 	const data = req.body;
@@ -105,4 +128,5 @@ module.exports = {
 	deleteUser,
 	userReserve,
 	submitReview,
+	loginUser
 };

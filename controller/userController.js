@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 let getAllUser = async (req, res) => {
 	let users = await userModel.find({});
 	if (users) {
-		res.status(200).json({ result: users.length, data: users });
+		res.status(200).json({ message:"success",length: users.length, data: users });
 	} else {
 		res.status(404).json({ message: 'fail' });
 	}

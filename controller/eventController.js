@@ -5,9 +5,9 @@ let getEvents = async (req, res) => {
 	let events = await eventModel.find({});
 	if (events) {
 		res.status(200).json({
-			result: events.length,
+			length: events.length,
 			data: events,
-      message: 'success'
+            message: 'success'
 		});
 	} else {
 		res.status(404).json({ message: 'fail' });

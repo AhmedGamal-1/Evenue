@@ -43,6 +43,16 @@ async function updateEventAndCreateReservations(userId, eventData, ticketsreq) {
 	}
 }
 
+let getAllReservation = async (req, res) => {
+	let reservations = await reservationModel.find({}).populate("eventId");
+
+	if (reservations) {
+		res.status(200).json({ message:"success",length: reservations.length, data: reservations });
+	} else {
+		res.status(404).json({ message: 'fail' });
+	}
+};
 module.exports = {
 	reserveTickets,
+	getAllReservation
 };

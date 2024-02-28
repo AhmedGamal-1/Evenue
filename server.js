@@ -12,6 +12,8 @@ const userRoutes = require('./routes/userRoutes');
 app.use('/users', userRoutes);
 const eventRoutes = require('./routes/eventRoute');
 app.use('/events', eventRoutes);
+const reservationRoutes = require('./routes/reservationRoute');
+app.use('/reservations', reservationRoutes);
 //#region
 mongoose
 	.connect(

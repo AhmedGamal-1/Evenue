@@ -1,8 +1,10 @@
 const userModel = require('../models/userModel');
 const eventController = require('../controller/eventController');
-const ticketController = require('./reservationController');
+const reservationController = require('./reservationController');
 const Event = require('../models/eventModel');
 const Review = require('../models/reviewModel');
+const reservationModel = require('../models/reservationTicket');
+
 const jwt = require('jsonwebtoken');
 
 
@@ -16,35 +18,43 @@ const upload = multer({ storage: storage });
 let getAllUser = async (req, res) => {
 	let users = await userModel.find({});
 	if (users) {
-		res.status(200).json({ result: users.length, data: users });
+		res.status(200).json({ message:"success",length: users.length, data: users });
 	} else {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
 let userReserve = async (req, res) => {
-	const ID = req.params.id;
-	let data = req.body;
-	let eventsReq = data.tickets;
-	let eventData = await eventController.getEventsByIdRes(data.eventId);
-	if (eventData) {
-		let result = await ticketController.reserveTickets(
-			ID,
-			eventData,
-			eventsReq,
-		);
-		console.log(result);
-		if (result.message == 'success') {
-			res.status(200).json({
-				message: 'success',
-				data: result.totalPrice,
-			});
-		} else {
-			res.status(404).json({ message: 'fail' });
-		}
-	} else {
-		res.status(404).json({ message: 'fail' });
-	}
+    const userId = req.params.id;
+    const reservationData = req.body;
+    
+    try {
+        let totalPrice = 0;
+        const reservationDetails = [];
+        
+        for (const event of reservationData) {
+			console.log("event.tickets",event.tickets);
+            const eventData = await eventController.getEventsByIdRes(event.eventId);
+            if (!eventData) {
+                return res.status(404).json({ message: 'Event not found' });
+            }
+            const eventTotalPrice = await reservationController.calculateTotalPrice(eventData, event.tickets);
+            if (eventTotalPrice === -1) {
+                return res.status(400).json({ message: 'Not enough tickets available' });
+            }
+            totalPrice += eventTotalPrice;
+            reservationDetails.push({ eventId: event.eventId,ticketInfo:event.tickets,totalPrice: eventTotalPrice });
+        }
+
+        await reservationController.updateEventAndCreateReservations(userId, reservationData,reservationDetails,totalPrice);
+        res.status(200).json({ message: 'success', totalPrice: totalPrice, reservationDetails: reservationDetails });
+    } catch (error) {
+        console.error('Error reserving tickets:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 };
+
+
 let getUserById = async (req, res) => {
 	const ID = req.params.id;
 	let user = await userModel.findOne({ _id: ID });
@@ -100,7 +110,7 @@ let loginUser = async (req, res) => {
 		const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '5d' });
         
 		// Return the token in the response
-		return res.status(200).json({ success: true, token });
+		return res.status(200).json({ message:'success', token });
 	  } else {
 		// User does not exist or credentials are invalid
 		return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -145,7 +155,6 @@ let uploadImage = async(req, res) => {
 		  const imageBuffer = req.file.buffer;
 		  // Generate a unique filename
 		  const filename = Date.now() + '-' + req.file.originalname;
-		//   const basePath =  "E:/ITI/Evenue/Back/Evenue";
 		  // Define the path where you want to save the image
 		  const filePath = path.join(__dirname, 'uploads', filename);
 		await fs.promises.writeFile(filePath, imageBuffer);

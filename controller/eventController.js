@@ -1,17 +1,34 @@
 const eventModel = require('../models/eventModel');
 // const ticketModel=require("../models/ticketModel");
-//hi
+
 let getEvents = async (req, res) => {
 	let events = await eventModel.find({});
 	if (events) {
 		res.status(200).json({
-			result: events.length,
+			length: events.length,
 			data: events,
+            message: 'success'
 		});
 	} else {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
+let getEventsByName = async (req, res) => {
+  let name = req.params.name;
+	let events = await eventModel.find({title:name});
+	if (events) {
+		res.status(200).json({
+			result: events.length,
+			data: events,
+      message: 'success'
+		});
+	} else {
+		res.status(404).json({ message: 'fail' });
+	}
+};
+
+
 let getEventsByIdRes = async id => {
 	try {
 		let event = await eventModel.findOne({ _id: id });
@@ -24,6 +41,8 @@ let getEventsByIdRes = async id => {
 		console.log(err);
 	}
 };
+
+
 let getEventsById = async (req, res) => {
 	try {
 		const ID = req.params.id;
@@ -35,6 +54,8 @@ let getEventsById = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
+
 let addEvent = (req, res) => {
 	try {
 		// let {ticket,...obj}=req.body;
@@ -81,4 +102,5 @@ module.exports = {
 	updateEvent,
 	deleteEvent,
 	getEventsByIdRes,
+  getEventsByName
 };

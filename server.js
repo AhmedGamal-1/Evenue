@@ -21,16 +21,16 @@ const reservationRoutes = require('./routes/reservationRoute');
 app.use('/reservations', reservationRoutes);
 
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // console.log("filename storage:", file);
-    cb(null, path.join(__dirname, "images"));
-  },
-  filename: (req, file, cb) => {
-    // console.log("filename storage:", file);
-    cb(null, Date.now() + "_" + file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     // console.log("filename storage:", file);
+//     cb(null, path.join(__dirname, "images"));
+//   },
+//   filename: (req, file, cb) => {
+//     // console.log("filename storage:", file);
+//     cb(null, Date.now() + "_" + file.originalname);
+//   },
+// });
 
 // const fileFilter = (req, file, cb) => {
 //   if (
@@ -59,11 +59,11 @@ mongoose
 		console.log(err);
 	});
 
-app.use(multer({ storage: storage}).single("image"));
-// console.log(storage.getDestination());
-// app.use("/images", express.static(path.join(__dirname, "images")));
-app.post('/api/upload', (req, res) => {
-  // Logic to handle the uploaded image and send a response
-  console.log(req.body);
-  res.json({body:req.body });
-});
+// app.use(multer({ storage: storage}).single("image"));
+// // console.log(storage.getDestination());
+// // app.use("/images", express.static(path.join(__dirname, "images")));
+// app.post('/api/upload', (req, res) => {
+//   // Logic to handle the uploaded image and send a response
+//   console.log(req.body);
+//   res.json({body:req.body });
+// });

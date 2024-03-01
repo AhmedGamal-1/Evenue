@@ -12,5 +12,5 @@ router.post('/login', userController.loginUser);
 router.put('/:id', userController.updateUser);
 router.delete('/:id', userController.deleteUser);
 
-router.post('/images',imageController.addImage);
+// router.post('/images',imageController.addImage);
 module.exports = router;

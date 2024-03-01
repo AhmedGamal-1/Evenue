@@ -12,6 +12,7 @@ let userSchema = {
 		tickets: { type: 'integer', minimum: 1 },
 		reviews: { type: 'integer', minimum: 1 },
 		credits: { type: 'integer', minimum: 1 },
+	
 	},
 	required: ['id', 'name', 'price'],
 	additionalProperties: false,

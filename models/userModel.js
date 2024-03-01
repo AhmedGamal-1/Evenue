@@ -44,5 +44,8 @@ const userSchema = new mongoose.Schema({
 			ref: 'CreditCard',
 		},
 	],
+	image: {
+		type: String, // Assuming you'll store the image data as a base64 string
+	  },
 });
 module.exports = mongoose.model('User', userSchema);

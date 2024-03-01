@@ -60,7 +60,6 @@ let addEvent = (req, res) => {
 	try {
 		// let {ticket,...obj}=req.body;
 		// console.log("my evennnnt",myEvent);
-		let myEvent = req.body;
 		myEvent = new eventModel(myEvent);
 		myEvent.save();
 		res.status(201).json({ message: 'success', data: myEvent });

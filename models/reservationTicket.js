@@ -6,15 +6,26 @@ const reservationSchema = new mongoose.Schema({
 		ref: 'User',
 		required: true,
 	},
-	eventId: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Event',
-		required: true,
-	},
-	quantity: {
-		type: Number,
-		required: true,
-	},
+	events: [{
+        eventId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Event',
+            required: true,
+        },
+       ticketInfo: [
+		{quantity: {
+            type: Number,
+            required: true,
+        },
+		type: {
+            type: String,
+            required: true,
+        }
+	}],
+		totalPrice:{
+			type:Number
+		}
+    }],
 	totalPrice: {
 		type: Number,
 		required: true,
@@ -23,6 +34,9 @@ const reservationSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	},
+	isPurchased:{
+		type:Boolean
+	}
 });
 
 module.exports = mongoose.model('Reservation', reservationSchema);

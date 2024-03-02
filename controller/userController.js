@@ -1,9 +1,20 @@
 const userModel = require('../models/userModel');
 const eventController = require('../controller/eventController');
-const ticketController = require('./reservationController');
+const reservationController = require('./reservationController');
 const Event = require('../models/eventModel');
 const Review = require('../models/reviewModel');
+const reservationModel = require('../models/reservationTicket');
+
 const jwt = require('jsonwebtoken');
+
+
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
+
+const storage = multer.memoryStorage(); // Store the image in memory (you can customize this)
+const upload = multer({ storage: storage });
+
 let getAllUser = async (req, res) => {
 	let users = await userModel.find({});
 	if (users) {
@@ -12,30 +23,38 @@ let getAllUser = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
 let userReserve = async (req, res) => {
-	const ID = req.params.id;
-	let data = req.body;
-	let eventsReq = data.tickets;
-	let eventData = await eventController.getEventsByIdRes(data.eventId);
-	if (eventData) {
-		let result = await ticketController.reserveTickets(
-			ID,
-			eventData,
-			eventsReq,
-		);
-		console.log(result);
-		if (result.message == 'success') {
-			res.status(200).json({
-				message: 'success',
-				data: result.totalPrice,
-			});
-		} else {
-			res.status(404).json({ message: 'fail' });
-		}
-	} else {
-		res.status(404).json({ message: 'fail' });
-	}
+    const userId = req.params.id;
+    const reservationData = req.body;
+    
+    try {
+        let totalPrice = 0;
+        const reservationDetails = [];
+        
+        for (const event of reservationData) {
+			console.log("event.tickets",event.tickets);
+            const eventData = await eventController.getEventsByIdRes(event.eventId);
+            if (!eventData) {
+                return res.status(404).json({ message: 'Event not found' });
+            }
+            const eventTotalPrice = await reservationController.calculateTotalPrice(eventData, event.tickets);
+            if (eventTotalPrice === -1) {
+                return res.status(400).json({ message: 'Not enough tickets available' });
+            }
+            totalPrice += eventTotalPrice;
+            reservationDetails.push({ eventId: event.eventId,ticketInfo:event.tickets,totalPrice: eventTotalPrice });
+        }
+
+        await reservationController.updateEventAndCreateReservations(userId, reservationData,reservationDetails,totalPrice);
+        res.status(200).json({ message: 'success', totalPrice: totalPrice, reservationDetails: reservationDetails });
+    } catch (error) {
+        console.error('Error reserving tickets:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 };
+
+
 let getUserById = async (req, res) => {
 	const ID = req.params.id;
 	let user = await userModel.findOne({ _id: ID });
@@ -45,12 +64,18 @@ let getUserById = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
-let addUser = (req, res) => {
-	let newUser = req.body;
+let addUser = async (req, res) => {
+	try{
+		let newUser = req.body;
+	const imageResponse = await uploadImage(req,res);
+	newUser.image = imageResponse;
 	const user = new userModel(newUser);
-	user.save();
-	res.status(201).json({ message: 'success', data: newUser });
-	res.status(404).json({ message: 'fail' });
+	await user.save();
+
+	res.status(201).json({ message: 'success', data: newUser });}
+	catch(err) {
+	console.log(err);
+	res.status(500).json({ message: 'Server Error' });}
 };
 let updateUser = async (req, res) => {
 	const ID = req.params.id;
@@ -83,9 +108,9 @@ let loginUser = async (req, res) => {
 	  if (user) {
 		// User exists, generate a JWT token
 		const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '5d' });
-  
+        
 		// Return the token in the response
-		return res.status(200).json({ success: true, token });
+		return res.status(200).json({ message:'success', token });
 	  } else {
 		// User does not exist or credentials are invalid
 		return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -119,7 +144,26 @@ let submitReview = async (req, res) => {
 	} catch (error) {
 		res.status(404).json({ message: 'fail' });
 	}
+
 };
+let uploadImage = async(req, res) => {
+		try {
+		  if (!req.file) {
+			return "{ message: 'No file uploaded' };"
+		  }
+		  // Access the uploaded image data using req.file.buffer
+		  const imageBuffer = req.file.buffer;
+		  // Generate a unique filename
+		  const filename = Date.now() + '-' + req.file.originalname;
+		  // Define the path where you want to save the image
+		  const filePath = path.join(__dirname, 'uploads', filename);
+		await fs.promises.writeFile(filePath, imageBuffer);
+
+    return filename;
+		} catch (err) {  
+		return{ error: 'Internal server error' };
+		}
+}
 module.exports = {
 	getAllUser,
 	getUserById,
@@ -129,4 +173,5 @@ module.exports = {
 	userReserve,
 	submitReview,
 	loginUser
+	
 };

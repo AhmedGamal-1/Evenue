@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 var validator = require('validator');
 const userSchema = new mongoose.Schema({
+	
 	name: {
 		type: String,
 		required: true,
@@ -44,9 +45,8 @@ const userSchema = new mongoose.Schema({
 			ref: 'CreditCard',
 		},
 	],
-  image:{
-    type:String,
-    // require:true
-  }
+	image: {
+		type: String, // Assuming you'll store the image data as a base64 string
+	  }
 });
 module.exports = mongoose.model('User', userSchema);

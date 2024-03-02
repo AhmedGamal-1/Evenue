@@ -63,8 +63,9 @@ let getEventsById = async (req, res) => {
 
 let addEvent = async (req, res) => {
 	try {
+		// let {ticket,...obj}=req.body;
+		// console.log("my evennnnt",myEvent);
 		let myEvent = req.body;
-	
 		const imageResponse = await uploadImage(req,res);
 		myEvent.image = imageResponse;
 		console.log(myEvent);

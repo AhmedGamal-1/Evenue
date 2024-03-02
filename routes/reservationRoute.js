@@ -6,6 +6,7 @@ router.get('/', reservationController.getAllReservation);
 router.get('/:id', reservationController.getAllReservationByUserId);
 router.put('/:id', reservationController.updateReservation);
 router.delete('/:id', reservationController.deleteReservation);
+// router.get('/:id', reservationController.getAllReservation);
 // router.get('/:id', reservationController.getAllReservationByUserId);
 // router.get('/:id', reservationController.getUserById);
 // router.post('/:id/res', reservationController.userReserve);
@@ -14,4 +15,6 @@ router.delete('/:id', reservationController.deleteReservation);
 // router.post('/login', reservationController.loginUser);
 
 
+// router.put('/:id', reservationController.reserveTickets);
+// router.delete('/:id', reservationController.deleteUser);
 module.exports = router;

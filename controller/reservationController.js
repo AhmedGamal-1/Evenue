@@ -77,8 +77,8 @@ let updateReservation = async (req, res) => {
 	}
 };
 
-async function updateEventAndCreateReservations(userId, reservationData,reservationDetails,totalPrice) {
-	try{console.log();
+async function updateEventAndCreateReservations(userId, reservationData,reservationDetails,totalPrice,totalQuantity) {
+	try{console.log("totalQuantity",totalQuantity);
 		for (const event of reservationData) {
 			    const eventData = await eventModel.findById(event.eventId);
 			    if (!eventData) {
@@ -104,6 +104,7 @@ async function updateEventAndCreateReservations(userId, reservationData,reservat
 			userId: userId,
 			events:reservationDetails,
 			totalPrice: totalPrice,
+			totalQuantity:totalQuantity,
 			timestamp: new Date(),
 			isPurchased: false
 		});
@@ -118,8 +119,7 @@ async function updateEventAndCreateReservations(userId, reservationData,reservat
 }
 function calculateTotalPrice(event, tickets) {
     let totalPrice = 0;
-	// console.log("tickets",tickets);
-	// console.log("event",event);
+
     for (const ticketInfo of tickets) {
         const ticket = event.tickets.find(t => t.type === ticketInfo.type);
 		// console.log("ticket",ticket);
@@ -130,11 +130,35 @@ function calculateTotalPrice(event, tickets) {
     }
     return totalPrice;
 }
+function calculateTotalQuantity(event, tickets) {
+    let totalQuantity = 0;
+
+    for (const ticketInfo of tickets) {
+        const ticket = event.tickets.find(t => t.type === ticketInfo.type);
+		// console.log("ticket",ticket);
+        if (!ticket || ticket.totalTickets < ticketInfo.quantity) {
+            return -1;
+        }
+        totalQuantity += ticketInfo.quantity;
+    }
+    return totalQuantity;
+}
+let deleteReservation= async (req, res) => {
+	const ID = req.params.id;
+	let reservation = await reservationModel.findOneAndDelete({ _id: ID });
+	if (reservation) {
+		res.status(200).json({ message: 'success' });
+	} else {
+		res.status(404).json({ message: 'fail' });
+	}
+};
 
 module.exports = {
     updateEventAndCreateReservations,
     calculateTotalPrice,
 	getAllReservation,
 	getAllReservationByUserId,
-	updateReservation
+	updateReservation,
+	calculateTotalQuantity,
+	deleteReservation
 };

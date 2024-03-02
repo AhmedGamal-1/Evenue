@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
 		},
 	],
 	image: {
-		// Assuming you'll store the image data as a base64 string
+ 
 	  },
 });
 module.exports = mongoose.model('User', userSchema);

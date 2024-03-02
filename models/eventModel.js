@@ -5,6 +5,9 @@ const eventSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	image:{
+		
+	},
 	location: {
 		type: String,
 		required: true,
@@ -12,17 +15,14 @@ const eventSchema = new mongoose.Schema({
 	facilities: [
 		{
 			type: String,
-			required: true,
+			// required: true,
 		},
 	],
 	organizer: {
 		type: String,
 		required: true,
 	},
-	img: {
-		type: String,
-		//  required:true,
-	},
+	
 	Description: {
 		type: String,
 		required: true,
@@ -31,40 +31,43 @@ const eventSchema = new mongoose.Schema({
 		{
 			type: {
 				type: String,
-				required: true,
+				// required: true,
 			},
 			reserved: {
 				type: Number,
-				required: true,
+				// required: true,
 			},
 			price: {
 				type: Number,
-				required: true,
+				// required: true,
 			},
 			totalTickets: {
 				type: Number,
-				required: true,
+				// required: true,
 			},
 		},
 	],
 	dates: [
 		{
-			date: { type: String, required: true }, //regular
+			date: { type: String, 
+				// required: true
+			 }, //regular
 			times: [
 				{
 					start: {
 						type: String,
-						required: true,
+						// required: true,
 					}, //price
 					end: {
 						type: String,
-						required: true,
+						// required: true,
 					}, //total ,res
 					_id: false,
 				},
 			],
 			_id: false,
 		},
+		
 	],
 	instructions: [
 		{

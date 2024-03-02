@@ -3,7 +3,7 @@ const router = express.Router();
 const userController = require('../controller/userController');
 const multer = require('multer');
 const upload = multer();
-const imageController = require('../controller/image/imageController')
+// const imageController = require('../controller/image/imageController')
 //#region
 router.get('/', userController.getAllUser);
 router.get('/:id', userController.getUserById);

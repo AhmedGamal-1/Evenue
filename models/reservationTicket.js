@@ -12,8 +12,12 @@ const reservationSchema = new mongoose.Schema({
             ref: 'Event',
             required: true,
         },
+		totalQuantity:{
+			type:Number,
+		},
        ticketInfo: [
-		{quantity: {
+		{
+			quantity: {
             type: Number,
             required: true,
         },
@@ -27,6 +31,10 @@ const reservationSchema = new mongoose.Schema({
 		}
     }],
 	totalPrice: {
+		type: Number,
+		required: true,
+	},
+	totalQuantity:{
 		type: Number,
 		required: true,
 	},

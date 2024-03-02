@@ -30,6 +30,7 @@ let userReserve = async (req, res) => {
     
     try {
         let totalPrice = 0;
+		let totalQuantity=0;
         const reservationDetails = [];
         
         for (const event of reservationData) {
@@ -39,14 +40,18 @@ let userReserve = async (req, res) => {
                 return res.status(404).json({ message: 'Event not found' });
             }
             const eventTotalPrice = await reservationController.calculateTotalPrice(eventData, event.tickets);
+            const eventTotalQuantity = await reservationController.calculateTotalQuantity(eventData, event.tickets);
+
             if (eventTotalPrice === -1) {
                 return res.status(400).json({ message: 'Not enough tickets available' });
             }
             totalPrice += eventTotalPrice;
-            reservationDetails.push({ eventId: event.eventId,ticketInfo:event.tickets,totalPrice: eventTotalPrice });
+			console.log("eventTotalQuantity",eventTotalQuantity);
+			totalQuantity+= eventTotalQuantity;
+            reservationDetails.push({ eventId: event.eventId,ticketInfo:event.tickets,totalPrice: eventTotalPrice,totalQuantity: eventTotalQuantity });
         }
 
-        await reservationController.updateEventAndCreateReservations(userId, reservationData,reservationDetails,totalPrice);
+        await reservationController.updateEventAndCreateReservations(userId, reservationData,reservationDetails,totalPrice,totalQuantity);
         res.status(200).json({ message: 'success', totalPrice: totalPrice, reservationDetails: reservationDetails });
     } catch (error) {
         console.error('Error reserving tickets:', error);
@@ -56,18 +61,21 @@ let userReserve = async (req, res) => {
 
 
 let getUserById = async (req, res) => {
-	const ID = req.params.id;
-	let user = await userModel.findOne({ _id: ID });
-	if (user) {
-		res.status(200).json({ data: user });
-	} else {
-		res.status(404).json({ message: 'fail' });
+	try{
+		const ID = req.params.id;
+		let user = await userModel.findOne({ _id: ID });
+		res.status(200).json({ message:"success",data: user });
+	}
+	
+	catch(err){
+		res.status(404).json({ message: err});
 	}
 };
 let addUser = async (req, res) => {
 	try{
 		let newUser = req.body;
 	const imageResponse = await uploadImage(req,res);
+
 	newUser.image = imageResponse;
 	const user = new userModel(newUser);
 	await user.save();
@@ -149,19 +157,18 @@ let submitReview = async (req, res) => {
 let uploadImage = async(req, res) => {
 		try {
 		  if (!req.file) {
-			return "{ message: 'No file uploaded' };"
+			return "user.jpg"
 		  }
 		  // Access the uploaded image data using req.file.buffer
 		  const imageBuffer = req.file.buffer;
 		  // Generate a unique filename
-		  const filename = Date.now() + '-' + req.file.originalname;
+		  const filename = Date.now()+'-'+ req.file.originalname;
 		  // Define the path where you want to save the image
-		  const filePath = path.join(__dirname, 'uploads', filename);
+		  const filePath = path.join(__dirname,'..', 'uploads', filename);
 		await fs.promises.writeFile(filePath, imageBuffer);
-
-    return filename;
+        return filename;
 		} catch (err) {  
-		return{ error: 'Internal server error' };
+		return{ error:err};
 		}
 }
 module.exports = {

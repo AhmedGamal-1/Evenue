@@ -28,6 +28,11 @@ const reservationSchema = new mongoose.Schema({
 	}],
 		totalPrice:{
 			type:Number
+		},
+		dateTime: {
+			day: { type: String },
+			start: { type: String },
+			end: { type: String }
 		}
     }],
 	totalPrice: {
@@ -44,7 +49,7 @@ const reservationSchema = new mongoose.Schema({
 	},
 	isPurchased:{
 		type:Boolean
-	}
+	},
 });
 
 module.exports = mongoose.model('Reservation', reservationSchema);

@@ -18,72 +18,78 @@ const upload = multer({ storage: storage });
 let getAllUser = async (req, res) => {
 	let users = await userModel.find({});
 	if (users) {
-		res.status(200).json({ message:"success",length: users.length, data: users });
+		res.status(200).json({ message: "success", length: users.length, data: users });
 	} else {
 		res.status(404).json({ message: 'fail' });
 	}
 };
 
 let userReserve = async (req, res) => {
-    const userId = req.params.id;
-    const reservationData = req.body;
-    
-    try {
-        let totalPrice = 0;
-		let totalQuantity=0;
-        const reservationDetails = [];
-        
-        for (const event of reservationData) {
-			console.log("event.tickets",event.tickets);
-            const eventData = await eventController.getEventsByIdRes(event.eventId);
-            if (!eventData) {
-                return res.status(404).json({ message: 'Event not found' });
-            }
-            const eventTotalPrice = await reservationController.calculateTotalPrice(eventData, event.tickets);
-            const eventTotalQuantity = await reservationController.calculateTotalQuantity(eventData, event.tickets);
+	const userId = req.params.id;
+	const reservationData = req.body;
 
-            if (eventTotalPrice === -1) {
-                return res.status(400).json({ message: 'Not enough tickets available' });
-            }
-            totalPrice += eventTotalPrice;
-			console.log("eventTotalQuantity",eventTotalQuantity);
-			totalQuantity+= eventTotalQuantity;
-            reservationDetails.push({ eventId: event.eventId,ticketInfo:event.tickets,totalPrice: eventTotalPrice,totalQuantity: eventTotalQuantity });
-        }
+	try {
+		let totalPrice = 0;
+		let totalQuantity = 0;
+		const reservationDetails = [];
 
-        await reservationController.updateEventAndCreateReservations(userId, reservationData,reservationDetails,totalPrice,totalQuantity);
-        res.status(200).json({ message: 'success', totalPrice: totalPrice, reservationDetails: reservationDetails });
-    } catch (error) {
-        console.error('Error reserving tickets:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
+		for (const event of reservationData) {
+
+			const eventData = await eventController.getEventsByIdRes(event.eventId);
+			if (!eventData) {
+				return res.status(404).json({ message: 'Event not found' });
+			}
+			const eventTotalPrice = await reservationController.calculateTotalPrice(eventData, event.tickets);
+			const eventTotalQuantity = await reservationController.calculateTotalQuantity(eventData, event.tickets);
+
+			if (eventTotalPrice === -1) {
+				return res.status(400).json({ message: 'Not enough tickets available' });
+			}
+			totalPrice += eventTotalPrice;
+			totalQuantity += eventTotalQuantity;
+			reservationDetails.push({
+				eventId: event.eventId,
+				ticketInfo: event.tickets,
+				totalPrice: eventTotalPrice,
+				totalQuantity: eventTotalQuantity,
+				dateTime: event.dateTime
+			});
+		}
+
+		await reservationController.updateEventAndCreateReservations(userId, reservationData, reservationDetails, totalPrice, totalQuantity);
+		res.status(200).json({ message: 'success', totalPrice: totalPrice, reservationDetails: reservationDetails });
+	} catch (error) {
+		console.error('Error reserving tickets:', error);
+		res.status(500).json({ message: 'Internal server error' });
+	}
 };
 
 
 let getUserById = async (req, res) => {
-	try{
+	try {
 		const ID = req.params.id;
 		let user = await userModel.findOne({ _id: ID });
-		res.status(200).json({ message:"success",data: user });
+		res.status(200).json({ message: "success", data: user });
 	}
-	
-	catch(err){
-		res.status(404).json({ message: err});
+
+	catch (err) {
+		res.status(404).json({ message: err });
 	}
 };
 let addUser = async (req, res) => {
-	try{
+	try {
 		let newUser = req.body;
-	const imageResponse = await uploadImage(req,res);
+		const imageResponse = await uploadImage(req, res);
 
-	newUser.image = imageResponse;
-	const user = new userModel(newUser);
-	await user.save();
+		newUser.image = imageResponse;
+		const user = new userModel(newUser);
+		await user.save();
 
-	res.status(201).json({ message: 'success', data: newUser });}
-	catch(err) {
-	console.log(err);
-	res.status(500).json({ message: 'Server Error' });}
+		res.status(201).json({ message: 'success', data: newUser });
+	}
+	catch (err) {
+		res.status(500).json({ message: 'Server Error' });
+	}
 };
 let updateUser = async (req, res) => {
 	const ID = req.params.id;
@@ -108,26 +114,26 @@ let deleteUser = async (req, res) => {
 };
 let loginUser = async (req, res) => {
 	const { email, password } = req.body;
-  
+
 	try {
-	  // Check if the user exists with the provided email and password
-	  const user = await userModel.findOne({ email, password });
-  
-	  if (user) {
-		// User exists, generate a JWT token
-		const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '5d' });
-        
-		// Return the token in the response
-		return res.status(200).json({ message:'success', token });
-	  } else {
-		// User does not exist or credentials are invalid
-		return res.status(401).json({ success: false, message: 'Invalid credentials' });
-	  }
+		// Check if the user exists with the provided email and password
+		const user = await userModel.findOne({ email, password });
+
+		if (user) {
+			// User exists, generate a JWT token
+			const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '5d' });
+
+			// Return the token in the response
+			return res.status(200).json({ message: 'success', token });
+		} else {
+			// User does not exist or credentials are invalid
+			return res.status(401).json({ success: false, message: 'Invalid credentials' });
+		}
 	} catch (error) {
-	  console.error('Error checking credentials:', error);
-	  return res.status(500).json({ success: false, message: 'Internal server error' });
+		console.error('Error checking credentials:', error);
+		return res.status(500).json({ success: false, message: 'Internal server error' });
 	}
-  };
+};
 
 let submitReview = async (req, res) => {
 	const data = req.body;
@@ -154,22 +160,22 @@ let submitReview = async (req, res) => {
 	}
 
 };
-let uploadImage = async(req, res) => {
-		try {
-		  if (!req.file) {
+let uploadImage = async (req, res) => {
+	try {
+		if (!req.file) {
 			return "user.jpg"
-		  }
-		  // Access the uploaded image data using req.file.buffer
-		  const imageBuffer = req.file.buffer;
-		  // Generate a unique filename
-		  const filename = Date.now()+'-'+ req.file.originalname;
-		  // Define the path where you want to save the image
-		  const filePath = path.join(__dirname,'..', 'uploads', filename);
-		await fs.promises.writeFile(filePath, imageBuffer);
-        return filename;
-		} catch (err) {  
-		return{ error:err};
 		}
+		// Access the uploaded image data using req.file.buffer
+		const imageBuffer = req.file.buffer;
+		// Generate a unique filename
+		const filename = Date.now() + '-' + req.file.originalname;
+		// Define the path where you want to save the image
+		const filePath = path.join(__dirname, '..', 'uploads', filename);
+		await fs.promises.writeFile(filePath, imageBuffer);
+		return filename;
+	} catch (err) {
+		return { error: err };
+	}
 }
 module.exports = {
 	getAllUser,
@@ -180,5 +186,5 @@ module.exports = {
 	userReserve,
 	submitReview,
 	loginUser
-	
+
 };

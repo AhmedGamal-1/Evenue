@@ -1,4 +1,5 @@
 const eventModel = require('../models/eventModel');
+const reservationTicket = require('../models/reservationTicket');
 const reservationModel = require('../models/reservationTicket');
 
 // async function reserveTickets(userId, eventData, ticketsreq) {
@@ -45,6 +46,7 @@ const reservationModel = require('../models/reservationTicket');
 // 	}
 // }
 
+
 let getAllReservation = async (req, res) => {
 	let reservations = await reservationModel.find({}).populate('events.eventId');
 	if (reservations) {
@@ -63,19 +65,19 @@ let getAllReservationByUserId = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
-let updateReservation = async (req, res) => {
-	const ID = req.params.id;
-	const data = req.body;
-	//in frontend in from group add isPurchased true
-	let user = await userModel.findOneAndUpdate({ _id: ID }, data, {
-		new: true,
-	});
-	if (user) {
-		res.status(200).json({ data: user });
-	} else {
-		res.status(404).json({ message: 'fail' });
-	}
-};
+// let updateReservation = async (req, res) => {
+// 	const ID = req.params.id;
+// 	const data = req.body;
+// 	//in frontend in from group add isPurchased true
+// 	let user = await userModel.findOneAndUpdate({ _id: ID }, data, {
+// 		new: true,
+// 	});
+// 	if (user) {
+// 		res.status(200).json({ data: user });
+// 	} else {
+// 		res.status(404).json({ message: 'fail' });
+// 	}
+// };
 
 async function updateEventAndCreateReservations(userId, reservationData,reservationDetails,totalPrice) {
 	try{console.log();
@@ -130,11 +132,27 @@ function calculateTotalPrice(event, tickets) {
     }
     return totalPrice;
 }
+let deleteSpecificReservation = async (req, res) => {
+	const ID = req.params.id;
+	const data = req.body;
+	console.log(data);
+	//in frontend in from group add isPurchased true
+	let reservedTicket = await reservationTicket.findOneAndUpdate({ _id: ID }, data, {
+		new: true,
+	});
+
+	if (reservedTicket) {
+		res.status(200).json({ data: reservedTicket });
+	} else {
+		res.status(404).json({ message: 'fail' });
+	}
+};
+
 
 module.exports = {
     updateEventAndCreateReservations,
     calculateTotalPrice,
 	getAllReservation,
 	getAllReservationByUserId,
-	updateReservation
+	deleteSpecificReservation
 };

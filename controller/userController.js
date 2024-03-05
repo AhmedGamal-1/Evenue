@@ -66,15 +66,23 @@ let getUserById = async (req, res) => {
 };
 let addUser = async (req, res) => {
 	try{
-		let newUser = req.body;
+	let newUser = req.body;
+	
+	const existingUser = await userModel.findOne({ email: newUser.email });
+
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
 	const imageResponse = await uploadImage(req,res);
 	newUser.image = imageResponse;
 	const user = new userModel(newUser);
+	console.log(imageResponse);
+	console.log(newUser);
 	await user.save();
 
 	res.status(201).json({ message: 'success', data: newUser });}
 	catch(err) {
-	console.log(err);
+
 	res.status(500).json({ message: 'Server Error' });}
 };
 let updateUser = async (req, res) => {

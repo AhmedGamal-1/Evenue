@@ -91,7 +91,6 @@ let addUser = async (req, res) => {
 	console.log(imageResponse);
 	console.log(newUser);
 	await user.save();
-
 	res.status(201).json({ message: 'success', data: newUser });}
 	catch(err) {
 	console.log(err);
@@ -122,19 +121,19 @@ let loginUser = async (req, res) => {
 	const { email, password } = req.body;
 
 	try {
-		// Check if the user exists with the provided email and password
-		const user = await userModel.findOne({ email, password });
-
-		if (user) {
-			// User exists, generate a JWT token
-			const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '5d' });
-
-			// Return the token in the response
-			return res.status(200).json({ message: 'success', token });
-		} else {
-			// User does not exist or credentials are invalid
-			return res.status(401).json({ success: false, message: 'Invalid credentials' });
-		}
+	  // Check if the user exists with the provided email and password
+	  const user = await userModel.findOne({ email, password });
+  
+	  if (user) {
+		// User exists, generate a JWT token
+		const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '1h' });
+        
+		// Return the token in the response
+		return res.status(200).json({ message:'success', token,email:user.email,id:user._id,role:user.role });
+	  } else {
+		// User does not exist or credentials are invalid
+		return res.status(401).json({ success: false, message: 'Invalid credentials' });
+	  }
 	} catch (error) {
 		console.error('Error checking credentials:', error);
 		return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -166,17 +165,17 @@ let submitReview = async (req, res) => {
 	}
 
 };
-let uploadImage = async (req, res) => {
-	try {
-		if (!req.file) {
-			return "user.jpg"
-		}
-		// Access the uploaded image data using req.file.buffer
-		const imageBuffer = req.file.buffer;
-		// Generate a unique filename
-		const filename = Date.now() + '-' + req.file.originalname;
-		// Define the path where you want to save the image
-		const filePath = path.join(__dirname, '..', 'uploads', filename);
+let uploadImage = async(req, res) => {
+		try {
+		  if (!req.file) {
+			return path.join(__dirname,'..', 'uploads/user.jpg');
+		  }
+		  // Access the uploaded image data using req.file.buffer
+		  const imageBuffer = req.file.buffer;
+		  // Generate a unique filename
+		  const filename = Date.now()+'-'+ req.file.originalname;
+		  // Define the path where you want to save the image
+		  const filePath = path.join(__dirname,'..', 'uploads', filename);
 		await fs.promises.writeFile(filePath, imageBuffer);
 		return filename;
 	} catch (err) {

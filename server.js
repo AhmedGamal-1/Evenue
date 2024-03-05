@@ -2,13 +2,17 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 7005;
 var cors = require('cors');
+const multer = require("multer");
+const path = require("path");
 const mongoose = require('mongoose');
-const path = require('path');
+// const path = require('path');
 //#region  mw
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 //#endregion
+
+
 const userRoutes = require('./routes/userRoutes');
 app.use('/users', userRoutes);
 const eventRoutes = require('./routes/eventRoute');
@@ -31,3 +35,4 @@ mongoose
 	.catch(err => {
 		console.log(err);
 	});
+

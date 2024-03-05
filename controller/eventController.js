@@ -1,6 +1,11 @@
 const eventModel = require('../models/eventModel');
 // const ticketModel=require("../models/ticketModel");
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
 
+const storage = multer.memoryStorage(); // Store the image in memory (you can customize this)
+const upload = multer({ storage: storage });
 let getEvents = async (req, res) => {
 	let events = await eventModel.find({});
 	if (events) {
@@ -56,18 +61,18 @@ let getEventsById = async (req, res) => {
 };
 
 
-let addEvent = (req, res) => {
+let addEvent = async (req, res) => {
 	try {
 		// let {ticket,...obj}=req.body;
 		// console.log("my evennnnt",myEvent);
 		let myEvent = req.body;
+		const imageResponse = await uploadImage(req,res);
+		myEvent.image = imageResponse;
+		console.log(myEvent);
 		myEvent = new eventModel(myEvent);
 		myEvent.save();
 		res.status(201).json({ message: 'success', data: myEvent });
-
-		// const newTicket={event:myEvent._id,...ticket};
-		// const tickets= new ticketModel(newTicket);
-		// tickets.save();
+		
 	} catch (err) {
 		console.log(err);
 		res.status(404).json({ message: 'fail' });
@@ -95,6 +100,23 @@ let deleteEvent = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+let uploadImage = async(req, res) => {
+	try {
+	  if (!req.file) {
+		return "user.jpg"
+	  }
+	  // Access the uploaded image data using req.file.buffer
+	  const imageBuffer = req.file.buffer;
+	  // Generate a unique filename
+	  const filename = Date.now()+'-'+ req.file.originalname;
+	  // Define the path where you want to save the image
+	  const filePath = path.join(__dirname,'..', 'uploads', filename);
+	await fs.promises.writeFile(filePath, imageBuffer);
+	return filename;
+	} catch (err) {  
+	return{ error:err};
+	}
+}
 module.exports = {
 	getEvents,
 	getEventsById,

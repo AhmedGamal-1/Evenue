@@ -75,11 +75,9 @@ let addUser = async (req, res) => {
 	try{
 		let newUser = req.body;
 	const imageResponse = await uploadImage(req,res);
-
 	newUser.image = imageResponse;
 	const user = new userModel(newUser);
 	await user.save();
-
 	res.status(201).json({ message: 'success', data: newUser });}
 	catch(err) {
 	console.log(err);
@@ -115,10 +113,10 @@ let loginUser = async (req, res) => {
   
 	  if (user) {
 		// User exists, generate a JWT token
-		const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '5d' });
+		const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '1h' });
         
 		// Return the token in the response
-		return res.status(200).json({ message:'success', token });
+		return res.status(200).json({ message:'success', token,email:user.email,id:user._id,role:user.role });
 	  } else {
 		// User does not exist or credentials are invalid
 		return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -157,7 +155,7 @@ let submitReview = async (req, res) => {
 let uploadImage = async(req, res) => {
 		try {
 		  if (!req.file) {
-			return "user.jpg"
+			return path.join(__dirname,'..', 'uploads/user.jpg');
 		  }
 		  // Access the uploaded image data using req.file.buffer
 		  const imageBuffer = req.file.buffer;

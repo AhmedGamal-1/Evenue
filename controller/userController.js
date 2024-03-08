@@ -4,6 +4,7 @@ const reservationController = require('./reservationController');
 const Event = require('../models/eventModel');
 const Review = require('../models/reviewModel');
 const reservationModel = require('../models/reservationTicket');
+var bcrypt = require("bcrypt");
 
 const jwt = require('jsonwebtoken');
 
@@ -81,15 +82,18 @@ let getUserById = async (req, res) => {
 let addUser = async (req, res) => {
 	try {
 		let newUser = req.body;
+    console.log(newUser);
 		const imageResponse = await uploadImage(req, res);
 
 		newUser.image = imageResponse;
 		const user = new userModel(newUser);
+    // console.log(user,"user");
 		await user.save();
 
 		res.status(201).json({ message: 'success', data: newUser });
 	}
 	catch (err) {
+    console.log(err);
 		res.status(500).json({ message: 'Server Error' });
 	}
 };
@@ -107,6 +111,8 @@ let updateUser = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
+
 let deleteUser = async (req, res) => {
 	const ID = req.params.id;
 	let user = await userModel.findOneAndDelete({ _id: ID });
@@ -116,6 +122,8 @@ let deleteUser = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
+
 let loginUser = async (req, res) => {
 	const { email, password } = req.body;
 

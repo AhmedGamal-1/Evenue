@@ -5,6 +5,7 @@ var cors = require('cors');
 const multer = require("multer");
 const path = require("path");
 const mongoose = require('mongoose');
+const reviewRout =require('./routes/reviewRout')
 // const path = require('path');
 //#region  mw
 app.use(express.urlencoded({ extended: true }));
@@ -20,7 +21,7 @@ app.use('/events', eventRoutes);
 const reservationRoutes = require('./routes/reservationRoute');
 app.use('/reservations', reservationRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+app.use(reviewRout);
 
 //#region
 mongoose

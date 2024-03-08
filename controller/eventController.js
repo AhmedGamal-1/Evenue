@@ -63,8 +63,7 @@ let getEventsById = async (req, res) => {
 
 let addEvent = async (req, res) => {
 	try {
-		// let {ticket,...obj}=req.body;
-		// console.log("my evennnnt",myEvent);
+
 		let myEvent = req.body;
 		const imageResponse = await uploadImage(req,res);
 		myEvent.image = imageResponse;
@@ -91,6 +90,8 @@ let updateEvent = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
+
 let deleteEvent = async (req, res) => {
 	const ID = req.params.id;
 	let event = await eventModel.findOneAndDelete({ _id: ID });
@@ -100,6 +101,8 @@ let deleteEvent = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
+
 let uploadImage = async(req, res) => {
 	try {
 	  if (!req.file) {
@@ -117,6 +120,8 @@ let uploadImage = async(req, res) => {
 	return{ error:err};
 	}
 }
+
+
 module.exports = {
 	getEvents,
 	getEventsById,
@@ -124,5 +129,5 @@ module.exports = {
 	updateEvent,
 	deleteEvent,
 	getEventsByIdRes,
-  getEventsByName
+  getEventsByName,
 };

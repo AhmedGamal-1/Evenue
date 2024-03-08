@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
 		},
 	],
 	image: {
- 
-	  },
+
+	},
 });
 module.exports = mongoose.model('User', userSchema);

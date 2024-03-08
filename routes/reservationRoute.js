@@ -13,8 +13,6 @@ router.delete('/:id', reservationController.deleteReservation);
 // router.post('/:id/review', reservationController.submitReview);
 // router.post('/add', reservationController.addUser);
 // router.post('/login', reservationController.loginUser);
-
-
-// router.put('/:id', reservationController.reserveTickets);
-// router.delete('/:id', reservationController.deleteUser);
+// router.patch('/:id', reservationController.updateReservation);
+router.patch('/:id', reservationController.deleteSpecificReservation);
 module.exports = router;

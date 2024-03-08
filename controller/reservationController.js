@@ -1,4 +1,5 @@
 const eventModel = require('../models/eventModel');
+const reservationTicket = require('../models/reservationTicket');
 const reservationModel = require('../models/reservationTicket');
 
 // async function reserveTickets(userId, eventData, ticketsreq) {
@@ -44,6 +45,7 @@ const reservationModel = require('../models/reservationTicket');
 // 		await reservation.save();
 // 	}
 // }
+
 
 let getAllReservation = async (req, res) => {
 	let reservations = await reservationModel.find({}).populate('events.eventId');
@@ -118,6 +120,7 @@ function calculateTotalPrice(event, tickets) {
 	let totalPrice = 0;
 
 	for (const ticketInfo of tickets) {
+		console.log(tickets);
 		const ticket = event.tickets.find(t => t.type === ticketInfo.type);
 		if (!ticket || ticket.totalTickets < ticketInfo.quantity) {
 			return -1;
@@ -147,12 +150,29 @@ let deleteReservation = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+let deleteSpecificReservation = async (req, res) => {
+	const ID = req.params.id;
+	const data = req.body;
+	console.log(data);
+	//in frontend in from group add isPurchased true
+	let reservedTicket = await reservationTicket.findOneAndUpdate({ _id: ID }, data, {
+		new: true,
+	});
+
+	if (reservedTicket) {
+		res.status(200).json({ data: reservedTicket });
+	} else {
+		res.status(404).json({ message: 'fail' });
+	}
+};
+
 
 module.exports = {
 	updateEventAndCreateReservations,
 	calculateTotalPrice,
 	getAllReservation,
 	getAllReservationByUserId,
+	deleteSpecificReservation,
 	updateReservation,
 	calculateTotalQuantity,
 	deleteReservation

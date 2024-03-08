@@ -27,7 +27,7 @@ let getAllUser = async (req, res) => {
 let userReserve = async (req, res) => {
 	const userId = req.params.id;
 	const reservationData = req.body;
-
+	console.log(reservationData)
 	try {
 		let totalPrice = 0;
 		let totalQuantity = 0;
@@ -57,7 +57,7 @@ let userReserve = async (req, res) => {
 		}
 
 		await reservationController.updateEventAndCreateReservations(userId, reservationData, reservationDetails, totalPrice, totalQuantity);
-		res.status(200).json({ message: 'success', totalPrice: totalPrice, reservationDetails: reservationDetails });
+		res.status(200).json({ message: 'Your transacion has been successfully completed', totalPrice: totalPrice, reservationDetails: reservationDetails });
 	} catch (error) {
 		console.error('Error reserving tickets:', error);
 		res.status(500).json({ message: 'Internal server error' });
@@ -77,25 +77,27 @@ let getUserById = async (req, res) => {
 	}
 };
 let addUser = async (req, res) => {
-	try{
-	let newUser = req.body;
-	
-	const existingUser = await userModel.findOne({ email: newUser.email });
+	try {
+		let newUser = req.body;
 
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email already exists' });
-    }
-	const imageResponse = await uploadImage(req,res);
-	newUser.image = imageResponse;
-	const user = new userModel(newUser);
-	console.log(imageResponse);
-	console.log(newUser);
-	await user.save();
+		const existingUser = await userModel.findOne({ email: newUser.email });
 
-	res.status(201).json({ message: 'success', data: newUser });}
-	catch(err) {
-	console.log(err);
-	res.status(500).json({ message: 'Server Error' });}
+		if (existingUser) {
+			return res.status(400).json({ message: 'Email already exists' });
+		}
+		const imageResponse = await uploadImage(req, res);
+		newUser.image = imageResponse;
+		const user = new userModel(newUser);
+		console.log(imageResponse);
+		console.log(newUser);
+		await user.save();
+
+		res.status(201).json({ message: 'success', data: newUser });
+	}
+	catch (err) {
+		console.log(err);
+		res.status(500).json({ message: 'Server Error' });
+	}
 };
 let updateUser = async (req, res) => {
 	const ID = req.params.id;

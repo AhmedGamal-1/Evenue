@@ -120,6 +120,7 @@ function calculateTotalPrice(event, tickets) {
 	let totalPrice = 0;
 
 	for (const ticketInfo of tickets) {
+		console.log(tickets);
 		const ticket = event.tickets.find(t => t.type === ticketInfo.type);
 		if (!ticket || ticket.totalTickets < ticketInfo.quantity) {
 			return -1;

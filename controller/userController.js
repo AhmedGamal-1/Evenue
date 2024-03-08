@@ -4,6 +4,7 @@ const reservationController = require('./reservationController');
 const Event = require('../models/eventModel');
 const Review = require('../models/reviewModel');
 const reservationModel = require('../models/reservationTicket');
+const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
 

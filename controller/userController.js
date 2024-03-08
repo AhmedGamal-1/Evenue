@@ -185,6 +185,7 @@ let uploadImage = async (req, res) => {
 		return { error: err };
 	}
 }
+// exports
 module.exports = {
 	getAllUser,
 	getUserById,

@@ -4,6 +4,7 @@ const reservationController = require('./reservationController');
 const Event = require('../models/eventModel');
 const Review = require('../models/reviewModel');
 const reservationModel = require('../models/reservationTicket');
+const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
 
@@ -129,7 +130,10 @@ let loginUser = async (req, res) => {
 		if (user) {
 			// User exists, generate a JWT token
 			const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '1h' });
+      var passwordValid = await bcrypt.compare(req.body.password, user.password);
 
+      if (!passwordValid)
+        return res.status(404).send("Invalid Email OR Password");
 			// Return the token in the response
 			return res.status(200).json({ message: 'success', token, email: user.email, id: user._id, role: user.role });
 		} else {

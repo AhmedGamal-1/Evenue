@@ -10,4 +10,7 @@ router.get('/getname/:name', eventController.getEventsByName);
 router.post('/add', upload.single('image'),eventController.addEvent);
 router.put('/:id', eventController.updateEvent);
 router.delete('/:id', eventController.deleteEvent);
+
+// router.post('/:id/review', eventController.setReview);
+
 module.exports = router;

@@ -4,6 +4,7 @@ const reservationController = require('./reservationController');
 const Event = require('../models/eventModel');
 const Review = require('../models/reviewModel');
 const reservationModel = require('../models/reservationTicket');
+const bcrypt = require('bcrypt')
 
 const jwt = require('jsonwebtoken');
 
@@ -76,6 +77,8 @@ let getUserById = async (req, res) => {
 		res.status(404).json({ message: err });
 	}
 };
+
+
 let addUser = async (req, res) => {
 	try {
 		let newUser = req.body;
@@ -96,6 +99,8 @@ let addUser = async (req, res) => {
 	console.log(err);
 	res.status(500).json({ message: 'Server Error' });}
 };
+
+
 let updateUser = async (req, res) => {
 	const ID = req.params.id;
 	const data = req.body;
@@ -108,6 +113,8 @@ let updateUser = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
+
 let deleteUser = async (req, res) => {
 	const ID = req.params.id;
 	let user = await userModel.findOneAndDelete({ _id: ID });
@@ -117,6 +124,8 @@ let deleteUser = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
+
 let loginUser = async (req, res) => {
 	const { email, password } = req.body;
 
@@ -168,6 +177,8 @@ let submitReview = async (req, res) => {
 	}
 
 };
+
+
 let uploadImage = async(req, res) => {
 		try {
 		  if (!req.file) {
@@ -185,6 +196,8 @@ let uploadImage = async(req, res) => {
 		return { error: err };
 	}
 }
+
+
 module.exports = {
 	getAllUser,
 	getUserById,

@@ -4,7 +4,6 @@ const reservationController = require('./reservationController');
 const Event = require('../models/eventModel');
 const Review = require('../models/reviewModel');
 const reservationModel = require('../models/reservationTicket');
-const bcrypt = require('bcrypt')
 
 const jwt = require('jsonwebtoken');
 
@@ -77,30 +76,28 @@ let getUserById = async (req, res) => {
 		res.status(404).json({ message: err });
 	}
 };
-
-
 let addUser = async (req, res) => {
 	try {
 		let newUser = req.body;
-
+		console.log('new userrrrrrrr', newUser);
 		const existingUser = await userModel.findOne({ email: newUser.email });
 
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email already exists' });
-    }
-	const imageResponse = await uploadImage(req,res);
-	newUser.image = imageResponse;
-	const user = new userModel(newUser);
-	console.log(imageResponse);
-	console.log(newUser);
-	await user.save();
-	res.status(201).json({ message: 'success', data: newUser });}
-	catch(err) {
-	console.log(err);
-	res.status(500).json({ message: 'Server Error' });}
+		if (existingUser) {
+			return res.status(400).json({ message: 'Email already exists' });
+		}
+		const imageResponse = await uploadImage(req, res);
+		newUser.image = imageResponse;
+		const user = new userModel(newUser);
+		console.log(imageResponse);
+		console.log(newUser);
+		await user.save();
+		res.status(201).json({ message: 'success', data: newUser });
+	}
+	catch (err) {
+		console.log(err);
+		res.status(500).json({ message: 'Server Error' });
+	}
 };
-
-
 let updateUser = async (req, res) => {
 	const ID = req.params.id;
 	const data = req.body;
@@ -113,8 +110,6 @@ let updateUser = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
-
-
 let deleteUser = async (req, res) => {
 	const ID = req.params.id;
 	let user = await userModel.findOneAndDelete({ _id: ID });
@@ -124,28 +119,26 @@ let deleteUser = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
-
-
 let loginUser = async (req, res) => {
 	const { email, password } = req.body;
 
 	try {
-	  // Check if the user exists with the provided email and password
-	  const user = await userModel.findOne({ email, password });
-  
-	  if (user) {
-		// User exists, generate a JWT token
-		const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '1h' });
-    var passwordValid = await bcrypt.compare(req.body.password, user.password);
+		// Check if the user exists with the provided email and password
+		const user = await userModel.findOne({ email, password });
 
-    if (!passwordValid)
-      return res.status(404).send("Invalid Email OR Password");
-		// Return the token in the response
-		return res.status(200).json({ message:'success', token,email:user.email,id:user._id,role:user.role });
-	  } else {
-		// User does not exist or credentials are invalid
-		return res.status(401).json({ success: false, message: 'Invalid credentials' });
-	  }
+		if (user) {
+			// User exists, generate a JWT token
+			const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '1h' });
+      var passwordValid = await bcrypt.compare(req.body.password, user.password);
+
+      if (!passwordValid)
+        return res.status(404).send("Invalid Email OR Password");
+			// Return the token in the response
+			return res.status(200).json({ message: 'success', token, email: user.email, id: user._id, role: user.role });
+		} else {
+			// User does not exist or credentials are invalid
+			return res.status(401).json({ success: false, message: 'Invalid credentials' });
+		}
 	} catch (error) {
 		console.error('Error checking credentials:', error);
 		return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -177,27 +170,24 @@ let submitReview = async (req, res) => {
 	}
 
 };
-
-
-let uploadImage = async(req, res) => {
-		try {
-		  if (!req.file) {
-			return path.join(__dirname,'..', 'uploads/user.jpg');
-		  }
-		  // Access the uploaded image data using req.file.buffer
-		  const imageBuffer = req.file.buffer;
-		  // Generate a unique filename
-		  const filename = Date.now()+'-'+ req.file.originalname;
-		  // Define the path where you want to save the image
-		  const filePath = path.join(__dirname,'..', 'uploads', filename);
+let uploadImage = async (req, res) => {
+	try {
+		if (!req.file) {
+			// return path.join(__dirname, '..', 'uploads/user.jpg');
+			return 'user.jpg';
+		}
+		// Access the uploaded image data using req.file.buffer
+		const imageBuffer = req.file.buffer;
+		// Generate a unique filename
+		const filename = Date.now() + '-' + req.file.originalname;
+		// Define the path where you want to save the image
+		const filePath = path.join(__dirname, '..', 'uploads', filename);
 		await fs.promises.writeFile(filePath, imageBuffer);
 		return filename;
 	} catch (err) {
 		return { error: err };
 	}
 }
-
-
 module.exports = {
 	getAllUser,
 	getUserById,

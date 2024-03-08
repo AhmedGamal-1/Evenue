@@ -47,8 +47,8 @@ const userSchema = new mongoose.Schema({
 		},
 	],
 	image: {
- 
-	  },
+
+	},
 });
 
 userSchema.pre("save", async function (next) {

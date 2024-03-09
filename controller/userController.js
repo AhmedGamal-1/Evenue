@@ -161,7 +161,7 @@ let submitReview = async (req, res) => {
 			$push: { reviews: review._id },
 		});
 
-		res.status(200).json({ message: 'success' });
+		res.status(200).json({ message: 'success',date:review });
 	} catch (error) {
 		res.status(404).json({ message: 'fail' });
 	}
@@ -195,5 +195,4 @@ module.exports = {
 	userReserve,
 	submitReview,
 	loginUser
-
 };

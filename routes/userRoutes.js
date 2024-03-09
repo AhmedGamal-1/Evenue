@@ -9,6 +9,7 @@ router.get('/', userController.getAllUser);
 router.get('/:id', userController.getUserById);
 router.post('/:id/res', userController.userReserve);
 router.post('/:id/review', userController.submitReview);
+router.get('/:id/review', userController.getReview);
 router.post('/add',upload.single('image'), userController.addUser);
 
 router.post('/login', userController.loginUser);

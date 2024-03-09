@@ -161,12 +161,27 @@ let submitReview = async (req, res) => {
 			$push: { reviews: review._id },
 		});
 
-		res.status(200).json({ message: 'success' });
+		res.status(200).json({ message: 'success',date:review });
 	} catch (error) {
 		res.status(404).json({ message: 'fail' });
 	}
 
 };
+
+let getReview =async(req,res)=>{
+  try {
+		// const ID = req.params.id;
+		let user = await Review.find({});
+		res.status(200).json({ message: "success", data: user });
+	}
+
+	catch (err) {
+    console.log(err);
+		res.status(404).json({ message: err });
+	}
+}
+
+
 let uploadImage = async (req, res) => {
 	try {
 		if (!req.file) {
@@ -194,6 +209,7 @@ module.exports = {
 	deleteUser,
 	userReserve,
 	submitReview,
+	getReview,
 	loginUser
 
 };

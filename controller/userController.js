@@ -4,6 +4,7 @@ const reservationController = require('./reservationController');
 const Event = require('../models/eventModel');
 const Review = require('../models/reviewModel');
 const reservationModel = require('../models/reservationTicket');
+var bcrypt = require("bcrypt");
 
 const jwt = require('jsonwebtoken');
 
@@ -119,21 +120,30 @@ let deleteUser = async (req, res) => {
 		res.status(404).json({ message: 'fail' });
 	}
 };
+
 let loginUser = async (req, res) => {
 	const { email, password } = req.body;
 
 	try {
-		// Check if the user exists with the provided email and password
-		const user = await userModel.findOne({ email, password });
+		// Check if the user exists with the provided email
+		const user = await userModel.findOne({ email });
 
 		if (user) {
-			// User exists, generate a JWT token
-			const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '1h' });
+			// User exists, now check if the password matches
+			const isPasswordMatch = await bcrypt.compare(password, user.password);
 
-			// Return the token in the response
-			return res.status(200).json({ message: 'success', token, email: user.email, id: user._id, role: user.role });
+			if (isPasswordMatch) {
+				// Passwords match, generate a JWT token
+				const token = jwt.sign({ userId: user._id, role: user.role }, 'secrmjcret', { expiresIn: '1h' });
+
+				// Return the token in the response
+				return res.status(200).json({ message: 'success', token, email: user.email, id: user._id, role: user.role });
+			} else {
+				// Passwords do not match
+				return res.status(401).json({ success: false, message: 'Invalid credentials' });
+			}
 		} else {
-			// User does not exist or credentials are invalid
+			// User does not exist
 			return res.status(401).json({ success: false, message: 'Invalid credentials' });
 		}
 	} catch (error) {
@@ -141,6 +151,7 @@ let loginUser = async (req, res) => {
 		return res.status(500).json({ success: false, message: 'Internal server error' });
 	}
 };
+
 
 let submitReview = async (req, res) => {
 	const data = req.body;
@@ -161,22 +172,22 @@ let submitReview = async (req, res) => {
 			$push: { reviews: review._id },
 		});
 
-		res.status(200).json({ message: 'success',date:review });
+		res.status(200).json({ message: 'success', date: review });
 	} catch (error) {
 		res.status(404).json({ message: 'fail' });
 	}
 
 };
 
-let getReview =async(req,res)=>{
-  try {
+let getReview = async (req, res) => {
+	try {
 		// const ID = req.params.id;
-		let user = await Review.find({});
+		let user = await Review.find({}).populate('userId');
 		res.status(200).json({ message: "success", data: user });
 	}
 
 	catch (err) {
-    console.log(err);
+		console.log(err);
 		res.status(404).json({ message: err });
 	}
 }
